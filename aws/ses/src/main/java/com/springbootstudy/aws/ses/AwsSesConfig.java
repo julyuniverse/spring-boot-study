@@ -23,9 +23,6 @@ public class AwsSesConfig {
 
     @Bean
     public SesClient sesClient() {
-        System.out.println(accessKeyId);
-        System.out.println(secretAccessKey);
-        System.out.println(region);
         AwsBasicCredentials awsBasicCredentials = AwsBasicCredentials.create(accessKeyId, secretAccessKey);
 
         return SesClient.builder()
