@@ -46,3 +46,6 @@ src/test
 
 ### env
 .env
+
+### p8
+*.p8

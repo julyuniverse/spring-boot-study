@@ -1,5 +1,6 @@
 package com.springbootstudy.sociallogin.controller;
 
+import com.springbootstudy.sociallogin.dto.ReissueRequest;
 import com.springbootstudy.sociallogin.dto.SocialLoginRequest;
 import com.springbootstudy.sociallogin.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,13 @@ public class AuthController {
     @PostMapping("/social-login")
     public ResponseEntity<Void> loginWithSocialProvider(@RequestBody SocialLoginRequest request) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
         authService.loginWithSocialProvider(request);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/reissue")
+    public ResponseEntity<Void> reissue(@RequestBody ReissueRequest request) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+        authService.refreshAppleToken(request.refreshToken());
 
         return ResponseEntity.ok().build();
     }
