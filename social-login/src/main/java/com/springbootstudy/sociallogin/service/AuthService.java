@@ -1,6 +1,11 @@
 package com.springbootstudy.sociallogin.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
 import com.springbootstudy.sociallogin.dto.*;
 import io.jsonwebtoken.*;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,17 +21,11 @@ import reactor.core.publisher.Mono;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.RSAPublicKeySpec;
-import java.util.Base64;
-import java.util.Date;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @author Lee Taesung
@@ -50,6 +49,8 @@ public class AuthService {
     private String appleTeamId;
     @Value("${apple.iss}")
     private String appleIss;
+    @Value("${google.client-id}")
+    private String googleClientId;
     private final HttpServletRequest httpServletRequest;
 
     /**
@@ -58,9 +59,9 @@ public class AuthService {
      * @author Lee Taesung
      * @since 1.0
      */
-    public void loginWithSocialProvider(SocialLoginRequest request) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+    public ResponseStatus loginWithSocialProvider(SocialLoginRequest request) throws IOException, GeneralSecurityException {
         // 플랫폼 확인
-        String platform = httpServletRequest.getHeader("platform");
+        String platform = httpServletRequest.getHeader("Platform");
         if (Objects.equals(platform, "iOS")) { // apple
             WebClient appleClient = WebClient.builder()
                     .baseUrl("https://appleid.apple.com/auth")
@@ -130,7 +131,35 @@ public class AuthService {
                 System.out.println("Error status code: " + ex.getStatusCode());
                 System.out.println("Error response body: " + ex.getResponseBodyAsString());
             }
+        } else if (Objects.equals(platform, "Android")) { // google
+            HttpTransport transport = new NetHttpTransport();
+            GsonFactory gsonFactory = new GsonFactory();
+            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(transport, gsonFactory)
+                    .setAudience(Collections.singletonList(googleClientId))
+                    .build();
+            GoogleIdToken idToken = verifier.verify(request.idToken());
+            if (idToken != null) {
+                GoogleIdToken.Payload payload = idToken.getPayload();
+                String userId = payload.getSubject();
+                System.out.println("userId: " + userId);
+
+                // Get profile information from payload
+                String email = payload.getEmail();
+                Boolean emailVerified = payload.getEmailVerified();
+                String name = (String) payload.get("name");
+                String pictureUrl = (String) payload.get("picture");
+                String locale = (String) payload.get("locale");
+                String familyName = (String) payload.get("family_name");
+                String givenName = (String) payload.get("given_name");
+            } else {
+                System.out.println("Invalid idToken.");
+            }
         }
+
+        return ResponseStatus.builder()
+                .code("C0001")
+                .message("Success.")
+                .build();
     }
 
     public String createClientSecret() {

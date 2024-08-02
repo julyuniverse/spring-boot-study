@@ -7,3 +7,37 @@ apple:
   iss:
   key:
     id: ${APPLE_KEY_ID}
+
+google:
+  client-id: ${GOOGLE_CLIENT_ID}
+  client-secret: ${GOOGLE_CLIENT_SECRET}
+
+spring:
+  # spring-security config
+  # Using generated security password: 1841f2d5-365e-4dd5-8a98-d25eed1cfbc8
+  # This generated password is for development use only. Your security configuration must be updated before running your application in production.
+  #
+  # The above warning is a warning that spring security has not configured the user.
+  security:
+    user:
+      name: hello
+      password: hello
+  # h2 db
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:study
+    username: study
+    password: 1234
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+    # As traffic increases, connections become scarce.
+    open-in-view: false
