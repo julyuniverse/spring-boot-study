@@ -1,16 +1,29 @@
+# logging
+#logging:
+#  level:
+#    org.springframework.security: DEBUG
+
+# apple
 apple:
   private-key: ${APPLE_PRIVATE_KEY}
-  aud:
-  redirect-uri:
   team-id: ${APPLE_TEAM_ID}
   client-id: ${APPLE_CLIENT_ID}
-  iss:
   key:
     id: ${APPLE_KEY_ID}
 
+# google
 google:
   client-id: ${GOOGLE_CLIENT_ID}
-  client-secret: ${GOOGLE_CLIENT_SECRET}
+
+# token
+token:
+  secret: ${TOKEN_SECRET}
+  # time to live
+  ttl:
+    #    access-token: 10000 # 10 seconds
+    access-token: 300000 # 300 seconds(5 minutes)
+    #    refresh-token: 30000 # 30 seconds
+    refresh-token: 864000000 # 864000 seconds(10 days)
 
 spring:
   # spring-security config
@@ -22,16 +35,18 @@ spring:
     user:
       name: hello
       password: hello
-  # h2 db
+  # mysql config
   datasource:
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:study
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/study
     username: study
     password: 1234
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+    # hikaricp
+    # The default value of mysql wait_timeout is 28800 (8 hours).
+    # If it is burdensome to set wait_timeout directly in mysql, set it as a session in properties.
+    hikari:
+      connection-init-sql: set wait_timeout = 610
+      max-lifetime: 600000
   jpa:
     hibernate:
       ddl-auto: create
@@ -41,3 +56,12 @@ spring:
         show_sql: true
     # As traffic increases, connections become scarce.
     open-in-view: false
+  data:
+    # redis
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      password: 1234
+      repositories:
+        # Implemented through redisTemplate and redisRepository is not used.
+        enabled: false

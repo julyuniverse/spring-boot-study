@@ -6,7 +6,6 @@ package com.springbootstudy.sociallogin.dto;
  */
 public record SocialLoginRequest(
         String idToken,
-        String authorizationCode,
         String firstName,
         String lastName
 ) {

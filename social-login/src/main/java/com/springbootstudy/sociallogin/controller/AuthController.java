@@ -1,8 +1,7 @@
 package com.springbootstudy.sociallogin.controller;
 
-import com.springbootstudy.sociallogin.dto.ReissueRequest;
-import com.springbootstudy.sociallogin.dto.ResponseStatus;
-import com.springbootstudy.sociallogin.dto.SocialLoginRequest;
+import com.auth0.jwk.JwkException;
+import com.springbootstudy.sociallogin.dto.*;
 import com.springbootstudy.sociallogin.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,8 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 
 /**
  * @author Lee Taesung
@@ -30,15 +27,26 @@ public class AuthController {
      * @author Lee Taesung
      * @since 1.0
      */
-    @PostMapping("/social-login")
-    public ResponseEntity<ResponseStatus> loginWithSocialProvider(@RequestBody SocialLoginRequest request) throws IOException, GeneralSecurityException {
+    @PostMapping("/login/uuid")
+    public ResponseEntity<UuidLoginResponse> loginWithUuid(@RequestBody UuidLoginRequest request) {
+        return ResponseEntity.ok(authService.loginWithUuid(request));
+    }
+
+    /**
+     * @author Lee Taesung
+     * @since 1.0
+     */
+    @PostMapping("/login/social")
+    public ResponseEntity<SocialLoginResponse> loginWithSocialProvider(@RequestBody SocialLoginRequest request) throws IOException, GeneralSecurityException, JwkException {
         return ResponseEntity.ok(authService.loginWithSocialProvider(request));
     }
 
-    @PostMapping("/reissue")
-    public ResponseEntity<Void> reissue(@RequestBody ReissueRequest request) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-        authService.refreshAppleToken(request.refreshToken());
-
-        return ResponseEntity.ok().build();
+    /**
+     * @author Lee Taesung
+     * @since 1.0
+     */
+    @PostMapping("/token/reissue")
+    public ResponseEntity<TokenDto> reissueToken(@RequestBody ReissueTokenRequest request) {
+        return ResponseEntity.ok(authService.reissueToken(request));
     }
 }
