@@ -2,7 +2,7 @@
 
 작성일: 2024-07-25
 
-### 필수 설치 조건
+### 필수 조건
 
 - jdk 17
 - mysql community edition 8(mysql 8)
@@ -12,7 +12,7 @@
 
 - 모바일 클라이언트에 대한 설계 및 개발이 되어 있어요. 웹 클라이언트 지원은 하지 않아요.
 
-### Client Reference
+### Client reference
 
 ios: https://github.com/julyuniverse/ios-study/tree/main/IosStudy/SocialLogin
 
