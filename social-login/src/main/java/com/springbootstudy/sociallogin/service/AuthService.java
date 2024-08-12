@@ -192,21 +192,36 @@ public class AuthService {
                     .setAudience(Collections.singletonList(googleClientId))
                     .build();
             GoogleIdToken idToken = verifier.verify(request.idToken());
-            if (idToken != null) {
-                GoogleIdToken.Payload payload = idToken.getPayload();
-                String userId = payload.getSubject();
-                System.out.println("userId: " + userId);
+            GoogleIdToken.Payload payload = idToken.getPayload();
+            String userIdentifier = payload.getSubject();
+            System.out.println("userIdentifier: " + userIdentifier);
 
-                // Get profile information from payload
-                String email = payload.getEmail();
-                Boolean emailVerified = payload.getEmailVerified();
-                String name = (String) payload.get("name");
-                String pictureUrl = (String) payload.get("picture");
-                String locale = (String) payload.get("locale");
-                String familyName = (String) payload.get("family_name");
-                String givenName = (String) payload.get("given_name");
+            // Get profile information from payload
+            String email = payload.getEmail();
+            String firstName = (String) payload.get("given_name");
+            String lastName = (String) payload.get("family_name");
+
+            // data insertion
+            Optional<Account> optionalAccount = accountRepository.findByUserIdentifier(userIdentifier);
+            if (optionalAccount.isPresent()) {
+                account = optionalAccount.get();
+                account.updateEmail(email);
+                if (StringUtils.hasText(firstName)) {
+                    account.updateFirstName(firstName);
+                }
+                if (StringUtils.hasText(lastName)) {
+                    account.updateLastName(lastName);
+                }
             } else {
-                System.out.println("Invalid idToken.");
+                account = Account.builder()
+                        .userIdentifier(userIdentifier)
+                        .email(email)
+                        .firstName(firstName)
+                        .lastName(lastName)
+                        .authority(Authority.ROLE_USER.name())
+                        .password(passwordEncoder.encode(DEFAULT_PASSWORD))
+                        .build();
+                accountRepository.save(account);
             }
         }
 

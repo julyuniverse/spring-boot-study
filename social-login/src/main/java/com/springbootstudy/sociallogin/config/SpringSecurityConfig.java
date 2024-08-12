@@ -18,7 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  */
 @Configuration
 @RequiredArgsConstructor
-@EnableWebSecurity
+@EnableWebSecurity(debug = true)
 public class SpringSecurityConfig {
     private final TokenAuthenticationEntryPoint tokenAuthenticationEntryPoint;
     private final TokenAccessDeniedHandler tokenAccessDeniedHandler;

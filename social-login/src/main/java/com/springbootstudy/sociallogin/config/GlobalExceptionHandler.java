@@ -18,7 +18,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = {CustomException.class})
     protected ResponseEntity<ErrorResponse> handleCustomException(CustomException e, HttpServletRequest request) {
-        log.error("[handleCustomException] deviceId: {}", request.getHeader("deviceId"));
+        log.error("[handleCustomException] deviceId: {}", request.getHeader("Device-Id"));
         log.error("[handleCustomException] Exception StackTrace: {", e);
         log.error("}");
         return ErrorResponse.toResponseEntity(e.getErrorCode());
@@ -26,7 +26,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = {Exception.class})
     protected ResponseEntity<?> handleException(Exception e, HttpServletRequest request) {
-        log.error("[handleCustomException] deviceId: {}", request.getHeader("deviceId"));
+        log.error("[handleCustomException] deviceId: {}", request.getHeader("Device-Id"));
         log.error("[handleException] Exception StackTrace: {", e);
         log.error("}");
         return ErrorResponse.toResponseEntity(e, HttpStatus.INTERNAL_SERVER_ERROR, "EXCEPTION");
