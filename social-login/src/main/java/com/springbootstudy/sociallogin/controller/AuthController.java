@@ -49,4 +49,13 @@ public class AuthController {
     public ResponseEntity<TokenDto> reissueToken(@RequestBody ReissueTokenRequest request) {
         return ResponseEntity.ok(authService.reissueToken(request));
     }
+
+    /**
+     * @author Lee Taesung
+     * @since 1.0
+     */
+    @PostMapping("/logout")
+    public ResponseEntity<ResponseStatus> logout() {
+        return ResponseEntity.ok(authService.logout());
+    }
 }

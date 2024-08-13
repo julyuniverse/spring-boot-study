@@ -323,4 +323,46 @@ public class AuthService {
 
         return tokenDto;
     }
+
+    /**
+     * 로그아웃
+     *
+     * @author Lee Taesung
+     * @since 1.0
+     */
+    @Transactional(noRollbackFor = {CustomException.class})
+    public ResponseStatus logout() {
+        Integer deviceId = Integer.parseInt(getDeviceId());
+        Integer accountId;
+
+        // 1-1. access token 검증
+        Authentication authentication;
+        try {
+            // 1-2. access token에서 어카운트아이디 가져오기
+            authentication = tokenProvider.getAuthentication(getAuthorizationToken(), TokenType.ACCESS);
+            accountId = Integer.parseInt(authentication.getName());
+
+            // 2. device 가져오기
+            Device device = deviceRepository.findByDeviceId(deviceId);
+
+            // 3. redis에서 (어카운트아이디:디바이스아이디) 기반으로 생성된 refresh token 값이 존재한다면 삭제
+            if (redisService.getData(accountId + ":" + device.getDeviceId()) != null) {
+                redisService.deleteData(accountId + ":" + device.getDeviceId());
+
+                // 3. access token을 블랙 리스트에 저장
+                DecodedJWT decodedJWT = tokenProvider.validateToken(getAuthorizationToken(), TokenType.ACCESS, false);
+                Long expiration = decodedJWT.getExpiresAt().getTime() - new Date().getTime();
+                redisService.setData(getAuthorizationToken(), "logout", expiration);
+            }
+
+            // 4. device null 처리
+            device.updateAccountId(null);
+
+            return new ResponseStatus(StatusCode.SUCCESS);
+        } catch (CustomException e) {
+            setNullToDevice(deviceId);
+
+            return new ResponseStatus(StatusCode.SUCCESS);
+        }
+    }
 }
