@@ -4,7 +4,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.6"
 }
 
-subprojects {
+configure(listOf(project(":aws:ses"), project(":social-login"))) {
     apply(plugin = "java-library")
     apply(plugin = "org.springframework.boot")
     apply(plugin = "io.spring.dependency-management")
@@ -21,6 +21,12 @@ subprojects {
     configurations {
         compileOnly {
             extendsFrom(configurations.annotationProcessor.get())
+        }
+
+        all {
+            // console msg: Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+            // 잠재적인 충돌을 피하기 위해서 commons-logging.jar 제거하기.
+            exclude("commons-logging", "commons-logging")
         }
     }
 
@@ -51,9 +57,8 @@ tasks.withType<Test> {
     enabled = false // 테스트 태스크 비활성화
 }
 
-/* plain.jar 생성 방지 */
 tasks.getByName<Jar>("jar") {
-    enabled = false
+    enabled = false // plain.jar 생성 방지
 }
 
 tasks.getByName<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {

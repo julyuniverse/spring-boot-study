@@ -8,8 +8,3 @@ dependencies {
     implementation("com.auth0:java-jwt:4.4.0")
     runtimeOnly("com.mysql:mysql-connector-j")
 }
-
-/* plain.jar 생성 방지 */
-tasks.getByName<Jar>("jar") {
-    enabled = false
-}
